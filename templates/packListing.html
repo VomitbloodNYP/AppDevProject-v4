@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}PokeImpact - {{ packName }}{% endblock %}
+
+{% block content %}
+{% from "includes/_formHelper.html" import render_field %}
+<script>
+    function validateForm() {
+        var img_file = document.getElementById("img_file");
+        var img_file_error = document.getElementById("img_file_error");
+        if (img_file == "") {
+            img_file_error.innerHTML= "Please select an image";
+            return false;
+        }
+        else {
+            var extension = img_file.value.split('.').pop().toLowerCase();
+            if (extension != "jpg" && extension != "jpeg" && extension != "png") {
+                img_file_error.innerHTML = "Invalid image type (Only accepts png, jpg or jpeg)";
+                return false;
+            }
+            else {
+                return true;
+            }
+        }
+    }
+</script>
+
+<h1 class="display-4">{{ packName }}</h1>
+<div>
+  {{ packName }} description goes here
+  <p>{{ packName }} contains a variety of cards featuring different Pokémon characters from the popular anime and video game franchise. {{ packName }} includes at least one rare or special card, as well as a mix of common and uncommon cards. The cards may feature artwork and statistics of the featured Pokémon, as well as other game-related information such as energy types and attack moves. {{ packName }} may also include special holographic or promotional cards. The cards are collectible and can be used to play the Pokémon trading card game. generated using chatgpt</p>
+  {{ packName }} photo goes here
+</div>
+<form method="POST" action="">
+  <div class="form-group">
+    Amount in your cart:
+    {{ render_field(form.pack_count, class="form-control") }}
+  </div>
+  <input type="submit" value="Update" class="btn btn-warning"/>
+</form>
+{% endblock %}

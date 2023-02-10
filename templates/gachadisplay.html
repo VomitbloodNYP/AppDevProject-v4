@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+{% extends "base.html" %}
+{% block title %}PokeImpact = Gacha display{% endblock %}
+
+{% block content %}
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <style>
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,800;1,100;1,200;1,300;1,400;1,500&display=swap');
+</style>
+</head>
+<body>
+        <div class="main">
+          <div class = "card">
+            <div class = "imgBx">
+                <img src="{{url_for('image', id=chosenvalue.id)}}" alt="image" height=500px width = 500px>
+            </div>
+            <div class = "content">
+                <div class ="details">
+                    <h2><span>{{chosenvalue.name}}</span></h2>
+                    <div class="data">
+                        <h3>Type:<br><span>{{chosenvalue.type}}</span></h3>
+                        <h3>Rarity:<br><span>{{chosenvalue.rarity}}</span></h3>
+                        <h3>Series:<br><span>{{chosenvalue.booster}}</span></h3>
+                    </div>
+                    <form action="{{url_for('gachadelete', id=chosenvalue.id)}}" method="POST">
+                        <input type="submit" value="Continue" class="btn btn-danger" >
+                    </form>
+                </div>
+            </div>
+        </div>
+</body>
+{% endblock %}
+</html>

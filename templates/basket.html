@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}PokeImpact{% endblock %}
+
+{% block content %}
+<h1 class="display-4">Shopping Cart</h1>
+<p>Welcome!</p>
+<div>
+  <!-- counter for number of unique packs-->
+  {% if count == 0 %}
+  <p>You have no packs in your shopping cart.</p> <p>Click <a href="/">here</a> to go back to the store page.</p>
+  {% elif count == 1 %}
+  <p>You have 1 unique pack in your shopping cart.</p>
+  {% else %}
+  <p>You have {{ count }} unique packs in your shopping cart.</p>
+  {% endif %}
+
+  <!-- counter for total number of packs -->
+
+</div>
+<div class="container">
+  <div class="row">
+    <div class="col-sm">
+      <a href="/"><button type="button" class="btn btn-success">Back</button></a>
+      <table class="table table-striped">
+        <thead>
+            <tr>
+              <th scope="col">Pack Name</th>
+              <th scope="col">Price</th>
+              <th scope="col">Count</th>
+              <th></th>
+            </tr>
+        </thead>
+        <tbody>
+          {% for pack in pack_list %}
+            <tr>
+              <td>{{ pack.get_pack_name() }}</td>
+              <td>${{ pack.calculate_pack_price() }}</td>
+              <td>{{ pack.get_pack_count() }}</td>
+              <td><a href="/packListing/{{pack.get_pack_id()}}" class="btn btn-warning">Update</a></td>
+              <td>
+                <form method="POST" action="{{url_for('delete_pack', pack_id=pack.get_pack_id())}}">
+                    <input type="submit" value="Delete" class="btn btn-danger"/>
+                </form>
+              </td>
+            </tr>
+          {% endfor %}
+      </table>
+      subtotal goes here<br>
+      <a href="/checkout"><button type="button" class="btn btn-success">Checkout</button></a>
+    </div>
+  </div>
+</div>
+{% endblock %}

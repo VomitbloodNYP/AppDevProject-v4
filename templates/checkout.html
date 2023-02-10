@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}PokeImpact{% endblock %}
+
+{% block content %}
+{% from "includes/_formHelper.html" import render_field %}
+<h1 class="display-4">Checkout</h1>
+<p>Welcome!</p>
+<form method="POST" action="">
+  <div class="container">
+    <div class="row">
+      <div class="col-sm">
+        <div class="row">
+          <h5>1. Choose a delivery address</h5>
+          <div>
+            <h6>Edit your address</h6>
+            {{ render_field(delivery_address_form.city, class="form-control") }}<br>
+            {{ render_field(delivery_address_form.full_name, class="form-control") }}<br>
+            {{ render_field(delivery_address_form.phone_number, class="form-control") }}<br>
+            {{ render_field(delivery_address_form.zip, class="form-control") }}<br>
+            {{ render_field(delivery_address_form.address, class="form-control") }}<br>
+          </div>
+        </div>
+        <hr><br>
+        <div class="row">
+          <h5>2. Choose a payment method</h5>
+          <div>
+            <h6>Your cards</h6>
+            {{ render_field(payment_method_form.card_number, class="form-control") }}<br>
+            {{ render_field(payment_method_form.card_holder_name, class="form-control") }}<br>
+            {{ render_field(payment_method_form.expiry_date, class="form-control") }}<br>
+            {{ render_field(payment_method_form.cvv, class="form-control") }}<br>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm right-panel">
+        <div class="row">
+          <h5>Order Total: $69</h5>
+        </div>
+        <div class="row">
+          <a href="success"><button class="btn btn-warning">Order now</button></a>
+        </div>
+      </div>
+    </div>
+  </div>
+</form>
+{% endblock %}

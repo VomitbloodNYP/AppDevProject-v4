@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}PokeImpact{% endblock %}
+
+{% block content %}
+{% from "includes/_formHelper.html" import render_field %}
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/storeYX.css') }}">
+</head>
+<script>
+    function validateForm() {
+        var img_file = document.getElementById("img_file");
+        var img_file_error = document.getElementById("img_file_error");
+        if (img_file == "") {
+            img_file_error.innerHTML= "Please select an image";
+            return false;
+        }
+        else {
+            var extension = img_file.value.split('.').pop().toLowerCase();
+            if (extension != "jpg" && extension != "jpeg" && extension != "png") {
+                img_file_error.innerHTML = "Invalid image type (Only accepts png, jpg or jpeg)";
+                return false;
+            }
+            else {
+                return true;
+            }
+        }
+    }
+</script>
+
+<h1 class="display-4">Store</h1>
+<p>Welcome!</p>
+<div class="container big-chungus">
+  {% for card in data %}
+  <section class="shop" id="shop">
+    <div class="container">
+      <div class="box">
+        <img src="{{url_for('image', id=card.id)}}" alt="IMAGE BROKEN!!1!!1!!1" class="cardDisplayImg">
+        <h4><strong>{{ card.name }}</strong></h4>
+        <p>{{ card.description }}</p>
+        <p>Type: {{ card.type }}</p>
+        <p>Rarity: {{ card.rarity }}</p>
+        <p>Booster: {{ card.booster }}</p>
+        <h5>${{ card.price }}</h5>
+        <a href="/packListing/{{  card.id  }}"><button type="button" class="btn btn-primary">BUY NOW</button></a>
+      </div>
+    </div>
+  </section>
+    {% endfor %}
+</div>
+{% endblock %}
