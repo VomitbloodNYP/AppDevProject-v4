@@ -5,7 +5,7 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import LargeBinary
 from flask import Flask, render_template, request, redirect, url_for, Response
 from Forms import EditPackForm, DeliveryAddressForm, PaymentMethodForm
-import shelve, Pack, io
+import shelve, Pack, io, CardInBasket
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import LargeBinary, create_engine
 from sqlalchemy.orm import sessionmaker
@@ -37,18 +37,30 @@ def add_pack():
 # shopping cart page - retrieve items from basket shelve db
 @app.route('/basket')
 def basket():
-    pack_dict = {}
+    # shelve things
+    basketdb = shelve.open('basket.db', 'r')
+    basket_dict = basketdb['Basket']
+    basketdb.close()
 
-    db = shelve.open('pack.db', 'r')
-    pack_dict = db['Packs']
-    db.close()
+    basket_list = []
+    for key in basket_dict:
+        cardInBasket = basket_dict.get(key)
+        basket_list.append(cardInBasket)
 
-    pack_list = []
-    for key in pack_dict:
-        pack = pack_dict.get(key)
-        pack_list.append(pack)
+    return render_template('basket.html', count=len(basket_list), basket_list=basket_list)
 
-    return render_template('basket.html', count=len(pack_list), pack_list=pack_list)
+    # pack_dict = {}
+    #
+    # db = shelve.open('pack.db', 'r')
+    # pack_dict = db['Packs']
+    # db.close()
+    #
+    # pack_list = []
+    # for key in pack_dict:
+    #     pack = pack_dict.get(key)
+    #     pack_list.append(pack)
+    #
+    # return render_template('basket.html', count=len(pack_list), pack_list=pack_list)
 
 # pack listing page show details of each pack - retrieve and update
 @app.route('/packListing/<int:id>/', methods=['GET', 'POST'])
@@ -56,22 +68,30 @@ def update_pack_listing(id):
     displayThisCard = Card.query.filter_by(id=id).first()
 
     # shelve things
-    db = shelve.open('basket.db', 'c')
+    basket_dict = {}
+    basketdb = shelve.open('basket.db', 'c')
 
     try:
-        basket_dict = db['Basket']
+        basket_dict = basketdb['Basket']
     except:
         print("Error in retrieving Packs from pack.db.")
 
     # add pack to basket
     if request.method == 'POST':
-        return redirect(url_for('success'))
+        cardInBasket = CardInBasket.CardInBasket(displayThisCard.id, displayThisCard.name, displayThisCard.type, displayThisCard.price, displayThisCard.rarity, displayThisCard.booster, displayThisCard.description, False)
+
+        basket_dict[cardInBasket.get_id()] = cardInBasket
+        basketdb['Basket'] = basket_dict
+
+        basketdb.close()
+
+        return redirect(url_for('basket'))
 
     return render_template('packListing.html', displayThisCard=displayThisCard)
 
 # delete pack from basket - retrieve and delete
-@app.route('/deletePack/<int:pack_id>', methods=['POST'])
-def delete_pack(pack_id):
+@app.route('/deletePack/<int:id>', methods=['POST'])
+def delete_pack(id):
     pack_dict = {}
 
     db = shelve.open('pack.db', 'w')
