@@ -5,12 +5,13 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import LargeBinary
 from flask import Flask, render_template, request, redirect, url_for, Response
 from Forms import EditPackForm, DeliveryAddressForm, PaymentMethodForm
-import shelve, Pack, io, CardInBasket
+import shelve, Pack, io, CardInBasket, PersonalDetails
+from PersonalDetails import *
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import LargeBinary, create_engine
 from sqlalchemy.orm import sessionmaker
 
-app=Flask(__name__)
+app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///Cards.db"
 app.config['SECRET_KEY'] = 'be3816ab3ea3b8672fa608a'
 db = SQLAlchemy(app)
@@ -42,25 +43,15 @@ def basket():
     basket_dict = basketdb['Basket']
     basketdb.close()
 
+    subtotal = 0
+
     basket_list = []
     for key in basket_dict:
         cardInBasket = basket_dict.get(key)
+        subtotal += cardInBasket.get_price()
         basket_list.append(cardInBasket)
 
-    return render_template('basket.html', count=len(basket_list), basket_list=basket_list)
-
-    # pack_dict = {}
-    #
-    # db = shelve.open('pack.db', 'r')
-    # pack_dict = db['Packs']
-    # db.close()
-    #
-    # pack_list = []
-    # for key in pack_dict:
-    #     pack = pack_dict.get(key)
-    #     pack_list.append(pack)
-    #
-    # return render_template('basket.html', count=len(pack_list), pack_list=pack_list)
+    return render_template('basket.html', count=len(basket_list), basket_list=basket_list, subtotal=subtotal)
 
 # pack listing page show details of each pack - retrieve and update
 @app.route('/packListing/<int:id>/', methods=['GET', 'POST'])
@@ -92,25 +83,57 @@ def update_pack_listing(id):
 # delete pack from basket - retrieve and delete
 @app.route('/deletePack/<int:id>', methods=['POST'])
 def delete_pack(id):
-    pack_dict = {}
+    basket_dict = {}
 
-    db = shelve.open('pack.db', 'w')
-    pack_dict = db['Packs']
+    basketdb = shelve.open('basket.db', 'w')
+    basket_dict = basketdb['Basket']
 
-    pack_dict.pop(pack_id)
+    basket_dict.pop(id)
 
-    db['Packs'] = pack_dict
-    db.close()
+    basketdb['Basket'] = basket_dict
+    basketdb.close()
 
-    return redirect(url_for('shopping_cart'))
+    return redirect(url_for('basket'))
 
 # checkout page - create retrieve and update
 @app.route('/checkout', methods=['GET', 'POST'])
 def checkout():
     delivery_address_form = DeliveryAddressForm(request.form)
     payment_method_form = PaymentMethodForm(request.form)
+
+    # shelve for delivery address
+    delivery_address_dict = {}
+    delivery_addressdb = shelve.open('delivery_address.db', 'c')
+
+    try:
+        delivery_address_dict = delivery_addressdb['Delivery Address']
+    except:
+        print("Error in retrieving Delivery Address from delivery_address.db.")
+
+    # shelve for payment method
+    payment_method_dict = {}
+    payment_methoddb = shelve.open('payment_method.db', 'c')
+
+    try:
+        payment_method_dict = payment_methoddb['Payment Method']
+    except:
+        print("Error in retrieving Payment Method from payment_method.db.")
+
     if request.method == 'POST' and delivery_address_form.validate() and payment_method_form.validate():
+        delivery_address = DeliveryAddress(1, delivery_address_form.city.data, delivery_address_form.full_name.data, delivery_address_form.phone_number.data, delivery_address_form.zip.data, delivery_address_form.address.data)
+        payment_method = PaymentMethod(payment_method_form.card_number.data, payment_method_form.card_holder_name.data, payment_method_form.expiry_date.data, payment_method_form.cvv.data)
+
+        delivery_address_dict[delivery_address.get_id()] = delivery_address
+        delivery_addressdb['Delivery Address'] = delivery_address_dict
+
+        payment_method_dict[payment_method.get_id()] = payment_method
+        payment_methoddb['Payment Method'] = payment_method_dict
+
+        delivery_addressdb.close()
+        payment_methoddb.close()
+
         return redirect(url_for('success'))
+
     return render_template('checkout.html', delivery_address_form=delivery_address_form, payment_method_form=payment_method_form)
 
 # very nice

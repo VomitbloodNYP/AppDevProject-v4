@@ -20,7 +20,8 @@
 <div class="container">
   <div class="row">
     <div class="col-sm">
-      <a href="/"><button type="button" class="btn btn-success">Back</button></a>
+      <a href="/"><button type="button" class="btn btn-success">Back to Store</button></a> <br><br>
+      Number of Items: <strong>{{ count }}</strong>
       <table class="table table-striped">
         <thead>
             <tr>
@@ -34,11 +35,24 @@
             </tr>
         </thead>
         <tbody>
-          {% for pack in pack_list %}
-
+          {% for basket in basket_list %}
+            <tr>
+              <td>{{ basket.get_name() }}</td>
+              <td>{{ basket.get_price() }}</td>
+              <td>{{ basket.get_type() }}</td>
+              <td>{{ basket.get_rarity() }}</td>
+              <td><img src="{{ url_for('image', id=basket.get_id()) }}" width="100px" height="100px"></td>
+              <td>{{ basket.get_description() }}</td>
+              <td>{{ basket.get_booster() }}</td>
+              <td>
+                <form method="POST" action="{{url_for('delete_pack', id=basket.get_id())}}">
+                    <input type="submit" value="Delete" class="btn btn-danger"/>
+                </form>
+              </td>
+            </tr>
           {% endfor %}
       </table>
-      subtotal goes here<br>
+      Subtotal: <strong>${{ subtotal }}</strong> <br><br>
       <a href="/checkout"><button type="button" class="btn btn-warning">Checkout</button></a>
     </div>
   </div>

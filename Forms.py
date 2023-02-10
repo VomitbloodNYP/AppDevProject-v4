@@ -9,11 +9,9 @@ class EditPackForm(Form):
     pack_price = IntegerField('', [validators.NumberRange(min=1, max=150), validators.DataRequired()], default=0)
 
 class DeliveryAddressForm(Form):
-    # city = StringField('City', [validators.DataRequired()])
     city = StringField('City/Region', validators=[DataRequired(), Regexp(r'^[a-zA-Z]+$', message="Name can only contain letters")])
     full_name = StringField('Full Name', [validators.DataRequired()])
     phone_number = StringField('Phone Number', validators=[DataRequired(), Regexp(r'^\d{8}$', message="Phone number must be 8 digits long")])
-    # phone_number = IntegerField('Phone Number', [validators.NumberRange(min=10000000, max=99999999, message="you idiot"), validators.DataRequired()])
     zip = StringField('Zip code', validators=[DataRequired(), Regexp(r'^\d{6}$', message="Zip code must be 6 digits long")])
     address = StringField('Address', [validators.DataRequired()], render_kw={"placeholder": "Block number, Street, Unit number"})
 
