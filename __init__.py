@@ -1,4 +1,4 @@
-# clean up import statements and remove unused imports
+# clean up import statements and remove unused imports (DO THIS LAST)
 import random
 from flask import Flask, flash, request, redirect, render_template,Response,url_for,send_file
 from flask_sqlalchemy import SQLAlchemy
@@ -26,10 +26,11 @@ class Card(db.Model):
     image = db.Column(LargeBinary)
     description = db.Column(db.String(255), nullable=True)
 
+# YX part starts here
 # main store page - retrieve from card db
 @app.route('/', methods=['GET', 'POST'])
 def add_pack():
-    print("lol")
+    print("hello there console snooper")
     data = Card.query.all()
     return render_template('store.html', data=data)
 
@@ -50,40 +51,23 @@ def basket():
     return render_template('basket.html', count=len(pack_list), pack_list=pack_list)
 
 # pack listing page show details of each pack - retrieve and update
-@app.route('/packListing/<int:pack_id>/', methods=['GET', 'POST'])
-def update_pack_listing(pack_id):
-    edit_pack_form = EditPackForm(request.form)
+@app.route('/packListing/<int:id>/', methods=['GET', 'POST'])
+def update_pack_listing(id):
+    displayThisCard = Card.query.filter_by(id=id).first()
+
+    # shelve things
+    db = shelve.open('basket.db', 'c')
+
+    try:
+        basket_dict = db['Basket']
+    except:
+        print("Error in retrieving Packs from pack.db.")
+
+    # add pack to basket
     if request.method == 'POST':
-        pack_dict = {}
-        db = shelve.open('pack.db', 'w')
-        pack_dict = db['Packs']
+        return redirect(url_for('success'))
 
-        # select the pack to update
-        pack = pack_dict.get(pack_id)
-
-        # update the pack
-        pack.set_pack_count(edit_pack_form.pack_count.data)
-
-        # update the pack in the database
-        db['Packs'] = pack_dict
-        db.close()
-
-        return redirect(url_for('basket'))
-    else:
-        pack_dict = {}
-        db = shelve.open('pack.db', 'r')
-        pack_dict = db['Packs']
-        db.close()
-
-        # select the pack to update
-        pack = pack_dict.get(pack_id)
-
-        # make form with old pack count
-        edit_pack_form.pack_count.data = pack.get_pack_count()
-
-        packName = pack.get_pack_name()
-
-        return render_template('packListing.html', form=edit_pack_form, packName=packName)
+    return render_template('packListing.html', displayThisCard=displayThisCard)
 
 # delete pack from basket - retrieve and delete
 @app.route('/deletePack/<int:pack_id>', methods=['POST'])
@@ -118,7 +102,9 @@ def success():
 @app.route('/fail')
 def fail():
     return render_template('fail.html')
+# YX part ends here
 
+# jonath part start
 @app.route('/addcard', methods=['GET', 'POST'])
 def add_card():
     if request.method == 'POST':
@@ -373,4 +359,4 @@ def sunmoon():
 #End zhenhyi code
 
 if __name__ == "__main__":
-    app.run()
+    app.run(debug=True, port=5000, host="127.0.0.69")

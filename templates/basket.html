@@ -2,16 +2,16 @@
 {% block title %}PokeImpact{% endblock %}
 
 {% block content %}
-<h1 class="display-4">Shopping Cart</h1>
+<h1 class="display-4">Basket</h1>
 <p>Welcome!</p>
 <div>
   <!-- counter for number of unique packs-->
   {% if count == 0 %}
-  <p>You have no packs in your shopping cart.</p> <p>Click <a href="/">here</a> to go back to the store page.</p>
+  <p>You have no packs in your basket.</p> <p>Click <a href="/">here</a> to go back to the store page.</p>
   {% elif count == 1 %}
-  <p>You have 1 unique pack in your shopping cart.</p>
+  <p>You have 1 unique pack in your basket.</p>
   {% else %}
-  <p>You have {{ count }} unique packs in your shopping cart.</p>
+  <p>You have {{ count }} unique packs in your basket.</p>
   {% endif %}
 
   <!-- counter for total number of packs -->
